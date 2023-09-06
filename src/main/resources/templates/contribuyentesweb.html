@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <meta charset="UTF-8">
+    <title>contribuyentes web </title>
+</head>
+<body style="padding:10px;"  >
+Contribuyentes web
+<br>
+<div th:text="${nroContribuyentes} + ' registros'" ></div>
+<br>
+<div id="div-busqueda" style="height:30px;" >
+    buscar: <input id="txt-buscar" type="text" onchange="evaluaTxtBuscar(this)" >
+    <button id="btn-buscar" style="padding:2px;" onclick="clickBtnBuscar();" >Buscar</button>
+</div>
+<br>
+<div id="div-tabla" style="height:250px;" >
+    <div class="row justify-content-center" data-th-each="contribuyente: ${contribuyentes}">
+        <div th:id="'author'+${contribuyente.IdContribuyente}" class="card-header" data-th-text=" '* ' + ${contribuyente.RUT} +'  ' + ${contribuyente.RazonSocial} + ' Giro '+ ${contribuyente.Giro}"  ></div>
+    </div>
+</div>
+<br>
+<div style="padding-top:50px;" >
+    <button id="btn-inicio" style="padding:5px; visibility:hidden;" onclick="clickBtnInicio();" >inicio</button>
+    <button id="btn-menos" style="padding:5px; visibility:hidden;" onclick="menosPaginas();" >menos</button>
+    <button class="btn-nros" data-th-each="nroFila: ${nro}" th:onclick="cambioPaginas([[${nroFila}]]);" th:text="${nroFila}" style="padding:10px; margin-left:5px;"  ></button>
+    <button id="btn-mas" style="padding:5px;" onclick="clickBtnMas();" >mas</button>
+    <button id="btn-final" style="padding:5px;" onclick="clickBtnFinal();" >final</button>
+</div>
+
+
+<!---
+<div class="row justify-content-center" data-th-each="contribuyente: ${contribuyentes}">
+    <div th:id="'author'+${contribuyente.IdContribuyente}" class="card-header" data-th-text="${contribuyente.RUT} +'  ' + ${contribuyente.RazonSocial}"  ></div>
+    <div th:id="'giro'+${contribuyente.IdContribuyente}" class="card-header" data-th-text="'Giro '+ ${contribuyente.Giro}"  ></div>
+</div>
+--->
+
+<script th:inline="javascript">
+
+    const nroContribuyentes = parseInt([[${nroContribuyentes}]] /10); // 10 nro de registros por pagina
+
+    const isEmpty =(string)=>{return typeof string === 'string' && string.length === 0;}
+
+    const evaluaTxtBuscar = (obj)=>{
+        if (obj.value.trim().length === 0) {
+          cambioPaginas(1);
+        }
+    }
+
+    const clickBtnBuscar = async (pag=0)=>{
+        let razon_social = document.getElementById('txt-buscar');
+
+        if(isEmpty(razon_social.value)){
+            alert("Sin texto para buscar");
+            return null;
+        }
+
+        let respuesta = await fetch(`/contribuyentesrestfbn/${razon_social.value}/${pag}`, { method:"GET", } )
+        .then((response) => {
+            if(response.ok){
+                return response.json().then(data => { return data });
+           }else{
+                throw Error(response.statusText);
+                return null;
+           }
+        })
+        .catch(err => {
+            console.log(err);
+            return err;
+        });
+
+        if( respuesta != null){
+              const divTabla = document.getElementById('div-tabla');
+              divTabla.innerHTML = "";
+              respuesta.forEach(function(dato) {
+                var div = document.createElement("div");
+                div.textContent = "* " +dato.rut + " " + dato.razonSocial + " Giro " + dato.giro;
+                divTabla.appendChild(div);
+              });
+        }
+    }
+
+    const menosPaginas = ()=>{
+        clickBtnMenos();
+    }
+
+    const clickBtnMenos = ()=>{
+       var losbtn =  document.getElementsByClassName('btn-nros');
+       Array.from(losbtn).forEach(function (element) {
+            element.innerHTML = parseInt(element.innerHTML) -1 ;
+            if(parseInt(element.innerHTML) <=1 ){
+                document.getElementById('btn-menos').style.visibility = "hidden";
+                document.getElementById('btn-inicio').style.visibility = "hidden";
+            }
+            if(parseInt(element.innerHTML) <=nroContribuyentes ){
+                document.getElementById('btn-mas').style.visibility = "visible";
+                document.getElementById('btn-final').style.visibility = "visible";
+            }
+            element.setAttribute( "onClick", "javascript: cambioPaginas("+element.innerHTML+");" );
+       });
+    }
+
+    const btnMenosVisible = ()=>{
+        var losnros = [[${nro}]];
+        let lastElement = losnros.slice(-1);
+        if(lastElement > 10){
+            document.getElementById('btn-menos').style.visibility = "visible";
+        }
+    }
+
+    btnMenosVisible();
+
+    const clickBtnInicio = ()=>{
+        document.getElementById('btn-inicio').style.visibility = "hidden";
+        document.getElementById('btn-menos').style.visibility = "hidden";
+        document.getElementById('btn-mas').style.visibility = "visible";
+        document.getElementById('btn-final').style.visibility = "visible";
+
+        var primeraUltimaHoja = 1
+        var losbtn = document.getElementsByClassName('btn-nros');
+
+        Array.from(losbtn).forEach(function (element) {
+            element.innerHTML = primeraUltimaHoja;
+            element.setAttribute( "onClick", "javascript: cambioPaginas("+element.innerHTML+");" );
+            primeraUltimaHoja +=1;
+        });
+    }
+
+    const clickBtnFinal = ()=>{
+        document.getElementById('btn-mas').style.visibility = "hidden";
+        document.getElementById('btn-final').style.visibility = "hidden";
+        document.getElementById('btn-inicio').style.visibility = "visible";
+        document.getElementById('btn-menos').style.visibility = "visible";
+
+
+        var primeraUltimaHoja = nroContribuyentes -9
+
+        var losbtn =  document.getElementsByClassName('btn-nros');
+
+        Array.from(losbtn).forEach(function (element) {
+            element.innerHTML = primeraUltimaHoja;
+            element.setAttribute( "onClick", "javascript: cambioPaginas("+element.innerHTML+");" );
+            primeraUltimaHoja +=1;
+        });
+    }
+
+    const clickBtnMas = ()=>{
+       document.getElementById('btn-inicio').style.visibility = "visible";
+       document.getElementById('btn-menos').style.visibility = "visible";
+
+       var losbtn =  document.getElementsByClassName('btn-nros');
+
+       Array.from(losbtn).forEach(function (element) {
+            element.innerHTML = parseInt(element.innerHTML) +1 ;
+            element.setAttribute( "onClick", "javascript: cambioPaginas("+element.innerHTML+");" );
+
+            if(parseInt(element.innerHTML) >=nroContribuyentes ){
+                document.getElementById('btn-mas').style.visibility = "hidden";
+                document.getElementById('btn-final').style.visibility = "hidden";
+            }
+
+        });
+    }
+
+    const cambioPaginas=(nro)=>{
+        var divTabla = document.getElementById('div-tabla');
+        divTabla.innerHTML = "";
+        if( !isEmpty(document.getElementById('txt-buscar').value) ){
+            clickBtnBuscar(nro - 1);
+            return;
+        }
+        redrawPaginas(nro - 1);
+    }
+
+    const redrawPaginas = async (id_libro)=>{
+        let respuesta = await fetch(`/contribuyentesrest/${id_libro}`, { method:"GET", } )
+        .then((response) => {
+            if(response.ok){
+                return response.json().then(data => { return data });
+           }else{
+                throw Error(response.statusText);
+                return null;
+           }
+        })
+        .catch(err => {
+            console.log(err);
+            return err;
+        });
+
+        /*****
+        console.log("respuesta: " + id_libro);
+        respuesta.forEach(function(numero) { console.log(numero); });
+        *****/
+
+        if( respuesta != null){
+          //  $('#title').val(respuesta.title);
+          const divTabla = document.getElementById('div-tabla');
+          respuesta.forEach(function(dato) {
+            var div = document.createElement("div");
+            div.textContent = "* " +dato.rut + " " + dato.razonSocial + " Giro " + dato.giro;
+            divTabla.appendChild(div);
+          });
+        }
+    }
+
+</script>
+</body>
+</html>
