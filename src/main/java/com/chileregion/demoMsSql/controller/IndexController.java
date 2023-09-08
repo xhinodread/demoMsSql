@@ -1,14 +1,8 @@
 package com.chileregion.demoMsSql.controller;
 
-import com.chileregion.demoMsSql.domain.Contribuyente;
-import com.chileregion.demoMsSql.domain.DocumentoReferencias;
-import com.chileregion.demoMsSql.domain.Documentos;
-import com.chileregion.demoMsSql.domain.Empresa;
+import com.chileregion.demoMsSql.domain.*;
 import com.chileregion.demoMsSql.persistance.entities.ContribuyenteEntity;
-import com.chileregion.demoMsSql.services.ContribuyenteService;
-import com.chileregion.demoMsSql.services.DocumentoReferenciasService;
-import com.chileregion.demoMsSql.services.DocumentosService;
-import com.chileregion.demoMsSql.services.EmpresaService;
+import com.chileregion.demoMsSql.services.*;
 import com.chileregion.demoMsSql.utils.ValidaRutUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +31,9 @@ public class IndexController {
     private DocumentosService documentosService;
     @Autowired
     private DocumentoReferenciasService documentoReferenciasService;
+
+    @Autowired
+    private ContratoVacacionesService contratoVacacionesService;
 
     @Autowired
     @Lazy
@@ -117,7 +114,6 @@ public class IndexController {
 
     @GetMapping("/referencias")
     public ResponseEntity<?> setReferencias(){
-
         DocumentoReferencias laReferencia = new DocumentoReferencias(
                null,
                 549985L,
@@ -127,10 +123,36 @@ public class IndexController {
                 "177268",
                 "1"
         );
+       if(false)documentoReferenciasService.setDocumentoReferencias(laReferencia);
+        return ResponseEntity.ok(laReferencia);
+    }
 
-        documentoReferenciasService.setDocumentoReferencias(laReferencia);
-        return ResponseEntity.ok("echo");
+    @GetMapping("/ver_vacaciones")
+    public ResponseEntity<?> verVacaciones(){
+        ContratoVacaciones unaVacacion = new ContratoVacaciones(
+          null,
+          7L,
+          "032023",
+          "2023-01-02",
+           "2023-01-20",
+                23
+        );
+        ContratoVacaciones laVacacion =  contratoVacacionesService.getContratoVacaciones(unaVacacion.getIdContratoPersonal());
+        return ResponseEntity.ok(laVacacion);
+    }
 
+    @GetMapping("/set_vacaciones")
+    public ResponseEntity<?> agregarVacaciones(){
+        ContratoVacaciones unaVacacion = new ContratoVacaciones(
+                null,
+                7L,
+                "2023",
+                "2023-01-02",
+                "2023-01-20",
+                23
+        );
+        if(!true)contratoVacacionesService.setContratoVacaciones(unaVacacion);
+        return ResponseEntity.ok(unaVacacion);
     }
 
 
