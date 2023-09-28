@@ -10,4 +10,15 @@ public class Generar {
         return nro;
     }
 
+    public String[] meses(){
+        String[] meses = new String[]{"Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"};
+        return meses;
+    }
+
+    public String mesesLlamada(int mes){
+
+        String[] meses = new String[]{"mes_enero", "mes_febrero", "mes_marzo", "mes_abril", "mes_mayo", "mes_junio", "mes_julio", "mes_agosto", "mes_septiembre", "mes_octubre", "mes_noviembre", "mes_diciembre"};
+        return meses[mes];
+    }
+
 }

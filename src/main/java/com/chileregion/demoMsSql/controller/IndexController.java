@@ -3,7 +3,14 @@ package com.chileregion.demoMsSql.controller;
 import com.chileregion.demoMsSql.domain.*;
 import com.chileregion.demoMsSql.persistance.entities.ContribuyenteEntity;
 import com.chileregion.demoMsSql.services.*;
+import com.chileregion.demoMsSql.utils.Generar;
+import com.chileregion.demoMsSql.utils.ProcesarImpUnico;
 import com.chileregion.demoMsSql.utils.ValidaRutUtil;
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -31,14 +38,17 @@ public class IndexController {
     private DocumentosService documentosService;
     @Autowired
     private DocumentoReferenciasService documentoReferenciasService;
-
     @Autowired
     private ContratoVacacionesService contratoVacacionesService;
-
     @Autowired
     @Lazy
     private ValidaRutUtil validaRutUtil;
-
+    @Autowired
+    @Lazy
+    private ProcesarImpUnico procesarImpUnico;
+    @Autowired
+    @Lazy
+    private Generar generar;
 
     @GetMapping("/")
     public String index(){
@@ -153,6 +163,85 @@ public class IndexController {
         );
         if(!true)contratoVacacionesService.setContratoVacaciones(unaVacacion);
         return ResponseEntity.ok(unaVacacion);
+    }
+
+    @GetMapping("/jsoup/{mes}")
+    public ResponseEntity<?> jSoup(@PathVariable("mes") int mes){
+        try{
+            String url = "https://www.sii.cl/valores_y_fechas/impuesto_2da_categoria/impuesto2023.htm";
+
+            if(false){
+                /**** Connection.Response, no solo permite acceso a la pagina ,
+                 *  tambien a los recursos como imagenes, sonidos, etc... ****/
+
+                Connection.Response res = Jsoup.connect(url)
+                        .ignoreContentType(true)
+                        .method(Connection.Method.GET)
+                        .execute();
+                return ResponseEntity.ok(res.body());
+            }
+
+            List<ImpUnicoSegCat> impUnicoSegCatList = new ArrayList<>();
+
+            Document document = Jsoup.connect(url).get();
+            //return ResponseEntity.ok(document.body().toString());
+            //System.out.println("mes: "+ mes );
+            //System.out.println("mes: "+ generar.mesesLlamada(mes-1) );
+
+            //Element datos0 = document.getElementById("mes_septiembre");
+            Element datos0 = document.getElementById(generar.mesesLlamada(mes-1));
+            Elements elements = datos0.getElementsByTag("tbody");
+            System.out.println(datos0.child(0).text());
+            /****/
+            for(Element elElement: elements ){
+                Elements trs = elElement.getElementsByTag("tr");
+              //  System.out.println("trs");
+                //System.out.println(trs);
+                for(Element elTr: trs){
+                    Elements tds = elTr.getElementsByTag("td");
+                   // System.out.println("");
+                   // System.out.println(tds.first() );
+                  //  System.out.println(tds.first().children() );
+                  //  System.out.println( "|"+tds.first().children().text()+"|" );
+                    if(tds.first().children().text().equals("MENSUAL")){
+                        System.out.println("---");
+                        System.out.println(tds.first().children().text());
+                        /****
+                        System.out.println(trs.get(0));
+                        System.out.println(trs.get(1));
+                        ******/
+                        for(int row=0;row<8;row++){
+                            Elements hijos = trs.get(row).children();
+                            /****
+                            System.out.println(hijos.get(1).text());
+                            System.out.println(hijos.get(2).text());
+                            System.out.println(hijos.get(3).text());
+                            System.out.println(hijos.get(4).text());
+                            System.out.println(hijos.get(5).text());
+                            System.out.println("tds...");
+                            ****/
+
+                            impUnicoSegCatList.add(procesarImpUnico.make(hijos));
+                        }
+                        // System.out.println(tds.outerHtml());
+                        //System.out.println(tds.textNodes());
+                    }
+                }
+            }
+            /****/
+
+            //System.out.println("");
+            //System.out.println("impUnicoSegCatList");
+            //System.out.println(impUnicoSegCatList);
+
+            return ResponseEntity.ok(impUnicoSegCatList);
+
+            //String datos = String.valueOf(document.getElementById("mes_octubre"));
+            //return ResponseEntity.ok(datos);
+        }catch (Exception e){
+            System.out.println(e);
+            return ResponseEntity.notFound().build();
+        }
     }
 
 

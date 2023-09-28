@@ -48,4 +48,11 @@ public class SimpleController {
     }
     *****/
 
+
+    @GetMapping("/jmapping")
+    public String jmapping(Model model) {
+        model.addAttribute("meses", generar.meses());
+        return "jmapping";
+    }
+
 }

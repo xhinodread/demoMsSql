@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" >
+  <head>
+      <meta charset="UTF-8">
+      <title>Jmapping Impuesto Único de Segunda Categoría</title>
+  </head>
+  <body>
+    <h1>Jmapping a Impuesto Único de Segunda Categoría</h1>
+    <div>
+        <select id="selectAnio" >
+            <option th:value="2023" th:text="2023"></option>
+        </select>
+        <select id="selectMeses" >
+            <option>Mes</option>
+            <option th:each="mes : ${meses}" th:value="${mes}" th:text="${mes}"></option>
+        </select>
+      <button id="btn-inicio" onclick="traerPagina();" >Traer</button>
+    </div>
+    <div id="resultado" style="padding-top:10px;" >
+
+    </div>
+  </body>
+
+    <script th:inline="javascript">
+      const traerPagina= async ()=>{
+        ///alert("traerPagina");
+        var elMes = document.getElementById("selectMeses");
+        var value = elMes.value;
+        var text = elMes.options[elMes.selectedIndex].text;
+
+        //console.log(value);
+        //console.log(text);
+        //console.log(elMes.selectedIndex);
+        //console.log(elMes);
+
+        if(elMes.selectedIndex < 1){
+            alert("Seleccione un mes");
+            return;
+        }
+
+        let respuesta = await fetch(`/jsoup/`+elMes.selectedIndex, { method:"GET", } )
+        .then((response) => {
+            if(response.ok){
+                return response.json().then(data => { return data });
+           }else{
+                throw Error(response.statusText);
+                return null;
+           }
+        })
+        .catch(err => {
+            console.log(err);
+            return err;
+        });
+
+        //console.log("respuesta");
+        //console.log(respuesta);
+
+        let resultado = document.getElementById("resultado");
+        resultado.innerHTML = "INSERT INTO ParametroRangoRemuneracion <br>"
+        + "(Desde,Hasta, Factor, Monto, Rebaja, FechaVigencia, CodigoParametro, Tramo, DiasDesde, DiasHasta) <br>"
+        + "VALUES <br>";
+        var elMesConsulta = "'2023-"+ (elMes.selectedIndex) + "-01'";
+        respuesta.forEach( (item) =>{
+            console.log(item);
+            //document.write(item.desde);
+            //document.write("<br>");
+            resultado.innerHTML +=  "( " +item.desde
+            +", "+item.hasta
+            +", "+item.factor
+            +", 0.00"
+            +", "+item.rebaja
+            +", CONVERT(datetime, "+elMesConsulta+", 111), 'IU', null, null, null),"
+             +"<br>"
+        });
+
+      }
+
+    </script>
+
+</html>
