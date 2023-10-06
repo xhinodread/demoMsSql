@@ -7,8 +7,10 @@ import com.chileregion.demoMsSql.persistance.entities.DocumentosEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface ContratoVacacionesRepository extends JpaRepository<ContratoVacacionesEntity, Long> {
-    ContratoVacacionesEntity findByIdContratoPersonal(Long idContratoPersonal);
+    List<ContratoVacacionesEntity> findByIdContratoPersonal(Long idContratoPersonal);
 
 }

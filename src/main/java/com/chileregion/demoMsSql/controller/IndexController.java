@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,6 +41,8 @@ public class IndexController {
     private DocumentoReferenciasService documentoReferenciasService;
     @Autowired
     private ContratoVacacionesService contratoVacacionesService;
+    @Autowired
+    private ContratoPersonalService contratoPersonalService;
     @Autowired
     @Lazy
     private ValidaRutUtil validaRutUtil;
@@ -101,10 +104,18 @@ public class IndexController {
             }else{
                 contribuyentes = contribuyenteService.getContribuyentesByRut(nombre);
             }
-
             return ResponseEntity.ok(contribuyentes);
         }
         return ResponseEntity.ok(null);
+    }
+    @GetMapping("/contratoPersonal/{id_empresa}")
+    public ResponseEntity<List<?>> getContribuyenteContrato( @PathVariable("id_empresa") Long id_empresa ){
+        List<ContratoPersonal> contratoPersonal = contratoPersonalService.getContratosEmpresas(id_empresa);
+        //System.out.println("contratoPersonal ");
+       // System.out.println(id_empresa);
+        //System.out.println(contratoPersonal);
+
+        return ResponseEntity.ok(contratoPersonal);
     }
 
     @GetMapping("/documentos/{id_documento}")
@@ -137,8 +148,14 @@ public class IndexController {
         return ResponseEntity.ok(laReferencia);
     }
 
-    @GetMapping("/ver_vacaciones")
-    public ResponseEntity<?> verVacaciones(){
+    @GetMapping("/ver_vacaciones/{id_contrato}")
+    public ResponseEntity<List<?>> verVacaciones(@PathVariable("id_contrato") Long id_contrato){
+
+        if(id_contrato == null){
+            return ResponseEntity.ok(null);
+        }
+
+        /****
         ContratoVacaciones unaVacacion = new ContratoVacaciones(
           null,
           7L,
@@ -147,7 +164,9 @@ public class IndexController {
            "2023-01-20",
                 23
         );
-        ContratoVacaciones laVacacion =  contratoVacacionesService.getContratoVacaciones(unaVacacion.getIdContratoPersonal());
+        //List<ContratoVacaciones> laVacacion =  contratoVacacionesService.getContratoVacaciones(unaVacacion.getIdContratoPersonal());
+         *****/
+        List<ContratoVacaciones> laVacacion =  contratoVacacionesService.getContratoVacaciones(id_contrato);
         return ResponseEntity.ok(laVacacion);
     }
 

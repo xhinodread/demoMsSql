@@ -13,6 +13,11 @@ import lombok.NonNull;
 public class ContratoVacacionesEntity {
     // IdVacacion  IdContratoPersonal Periodo     Desde                   Hasta
 
+    /*****
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "idContribuyente")
+    private ContribuyenteEntity contribuyenteEntity;
+    ****/
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="IdVacacion")
@@ -29,6 +34,10 @@ public class ContratoVacacionesEntity {
     @NonNull
     @Column(name="Hasta", nullable = false, unique = true)
     private String hasta;
+
+    @Column(name="dias")
+    private Integer dias;
+
 
 
 }

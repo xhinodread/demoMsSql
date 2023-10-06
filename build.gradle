@@ -25,16 +25,19 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	compileOnly 'org.projectlombok:lombok'
+
+	implementation 'org.webjars:bootstrap:5.0.0'
+
 	runtimeOnly 'com.microsoft.sqlserver:mssql-jdbc:6.5.1.jre9-preview'
 
 	implementation 'com.googlecode.jmapper-framework:jmapper-core:1.4.0'
+	implementation 'org.jsoup:jsoup:1.16.1'
 
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:3.1.2'
 
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-	implementation 'org.jsoup:jsoup:1.16.1'
 
 }
 /*****

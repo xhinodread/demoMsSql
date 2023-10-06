@@ -20,7 +20,7 @@ public class EmpresaServiceDbImp implements EmpresaService {
     public List<Empresa> getEmpresas() {
 
         //JMapper<Empresa, EmpresaEntity> mapper = new JMapper<>(Empresa.class, EmpresaEntity.class);
-        JMapper<Empresa, EmpresaEntity> jmapper = new JMapper<>(Empresa.class, EmpresaEntity.class);
+        ////JMapper<Empresa, EmpresaEntity> jmapper = new JMapper<>(Empresa.class, EmpresaEntity.class);
 
        // List<EmpresaEntity> empresasX = empresaRepository.findAll();
        // System.out.println("empresasX: " + empresasX);

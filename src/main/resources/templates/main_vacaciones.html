@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Vacaciones</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" th:href="@{/favicon.ico}"/>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/5.0.0/css/bootstrap.min.css} "/>
+</head>
+<body>
+    <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+        <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">Vacaciones</a>
+        <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </header>
+
+    <div class="container-fluid mt-5">
+        <div class="row">
+            <div class="col-auto">
+                <label for="empresa" class="form-label">Empresa</label>
+                <select id="empresa" class="form-select" aria-label="Empresa">
+                    <option selected>Seleccione</option>
+                    <option th:each="empresa : ${empresas}" th:value="${empresa.id}" th:text="${empresa.razonSocial}"></option>
+                </select>
+            </div>
+            <div class="col-auto">
+                <label for="nombre_funcionario" class="form-label">Nombre funcionario</label>
+                <input id="nombre_funcionario" type="text" class="form-control"  placeholder="Juan Peréz">
+                <input type="hidden" id="id_contribuyente">
+                <input type="hidden" id="id_contrato">
+            </div>
+            <div class="col-auto">
+                <label for="rut_funcionario" class="form-label">Rut</label>
+                <input id="rut_funcionario" type="text" class="form-control"  readonly placeholder="...">
+            </div>
+            <div class="col-2">
+                <label for="dias_vacaciones_funcionario" class="form-label">Dias vacaciones</label>
+                <input id="dias_vacaciones_funcionario" type="text" class="form-control"  readonly placeholder="0">
+            </div>
+        </div>
+        <div class="row mt-4 text-center">
+            <div>VACACIONES DEL FUNCIONARIO</div>
+            <div class="table-responsive-sm">
+                <table id="tbVacaciones" class="table table-sm table-light table-hover table-striped table-bordered border-secondary">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">PERIODO</th>
+                        <th scope="col">DESDE</th>
+                        <th scope="col">HASTA</th>
+                        <th scope="col">DIAS</th>
+                        <th scope="col">BORRAR</th>
+                        <th scope="col">COMPROBANTE</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row m-4">
+            <div class="col-4" >
+                <!--  <button class="btn btn-primary" onclick="popAddVacacion()" >Agregar Vacación</button>
+              Button trigger modal -->
+                <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="datePicker()" >
+                    Agregar Vacación
+                </button>
+                <br>
+                <hr>
+                <input id="project">
+                <input type="hidden" id="project-id">
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel text-center" >Agregar Vacación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <p>Desde<input type="text" id="datepickerDesde"></p>
+                            </div>
+                            <div class="col-6">
+                                <p>Hasta<input type="text" id="datepickerHasta"></p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <button class="btn btn-outline-dark btn-sm" >Calcular Días</button>
+                            </div>
+                            <div class="col-md-4">
+                                dias vaca
+                            </div>
+                            <div class="col-md-4">
+                                dias solic
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-outline-success">Guardar cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js" integrity="sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js" integrity="sha384-zNy6FEbO50N+Cg5wap8IKA4M/ZnLJgzc6w2NqACZaK0u0FXfOWRRJOnQtpZun8ha" crossorigin="anonymous"></script>
+
+<script th:src="@{/webjars/popper.js/2.9.2/umd/popper.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/5.0.0/js/bootstrap.min.js}"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+<!--- <script src="https://unpkg.com/gijgo@1.9.14/js/gijgo.min.js" type="text/javascript"></script>  -->
+<script th:src="@{/js/moment.min.js}"></script>
+<script th:src="@{/js/main_vacaciones.js}"></script>
+</html>

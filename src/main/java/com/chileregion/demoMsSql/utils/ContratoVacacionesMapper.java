@@ -1,6 +1,7 @@
 package com.chileregion.demoMsSql.utils;
 
 import com.chileregion.demoMsSql.domain.ContratoVacaciones;
+import com.chileregion.demoMsSql.domain.Contribuyente;
 import com.chileregion.demoMsSql.persistance.entities.ContratoVacacionesEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

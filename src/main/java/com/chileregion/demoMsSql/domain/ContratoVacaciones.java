@@ -16,4 +16,5 @@ public class ContratoVacaciones {
     private String desde;
     private String hasta;
     private Integer dias;
+    //private Contribuyente contribuyente;
 }
