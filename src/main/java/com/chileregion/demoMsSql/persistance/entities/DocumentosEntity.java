@@ -37,7 +37,7 @@ public class DocumentosEntity {
     private String rut;
     *****/
     @Column(name="IdEmpresa")
-    private Long IdEmpresa;
+    private Long idEmpresa;
     @Column(name="Folio")
     private String folio;
     @Column(name="FechaEmision")private String fecha_emision;
@@ -46,6 +46,8 @@ public class DocumentosEntity {
     @Column(name="MontoTotal")private Long monto_total;
     @Column(name="MontoReal")private Long monto_real;
     @Column(name="Estado")private String estado;
+    @Column(name="IdOperacion") private String idOperacion;
+    @Column(name="MontoIva") private String montoIva;
 
 
     public EmpresaEntity getEmpresaEntity() {

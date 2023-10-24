@@ -1,9 +1,7 @@
 package com.chileregion.demoMsSql.persistance.repository;
 
-import com.chileregion.demoMsSql.domain.Documentos;
 import com.chileregion.demoMsSql.persistance.entities.DocumentosEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 
@@ -18,6 +16,13 @@ public interface DocumentosRepository extends JpaRepository<DocumentosEntity, Lo
     ******/
 
     DocumentosEntity findByIdDteCabecera(Long idDteCabecera);
+
+    DocumentosEntity findByFolioAndIdEmpresa(String folio, Long idEmpresa);
+    //getDocumentoFolioAndIdEmpresa
+
+    DocumentosEntity findByFolioAndIdEmpresaAndIdOperacionAndTipo(String folio, Long idEmpresa, String idOperacion, String tipo);
+
+
 
 
 }

@@ -22,6 +22,8 @@ public class DocumentosMapper {
             documentosEntity.getMonto_total(),
             documentosEntity.getMonto_real(),
             documentosEntity.getEstado(),
+            documentosEntity.getIdOperacion(),
+            documentosEntity.getMontoIva(),
             empresaMapper(documentosEntity.getEmpresaEntity()),
             contribuyenteMapper(documentosEntity.getContribuyenteEntity()),
             documentoDetallesMapper(documentosEntity.getDocumentoDetallesEntity()),

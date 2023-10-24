@@ -7,5 +7,7 @@ public interface DocumentosService {
 
     Documentos getDocumentoId(Long id);
 
+    Documentos getDocumentoFolio(Long folio, Long IdEmpresa);
+
 
 }

@@ -1,9 +1,7 @@
 package com.chileregion.demoMsSql.services;
 
 import com.chileregion.demoMsSql.domain.Documentos;
-import com.chileregion.demoMsSql.persistance.entities.ContribuyenteEntity;
 import com.chileregion.demoMsSql.persistance.entities.DocumentosEntity;
-import com.chileregion.demoMsSql.persistance.entities.EmpresaEntity;
 import com.chileregion.demoMsSql.persistance.repository.DocumentosRepository;
 import com.chileregion.demoMsSql.utils.DocumentosMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,4 +32,18 @@ public class DocumentosServiceImp implements DocumentosService {
         // Documentos destination = documentoMapper.getDestination(documento);
         return documentosMapper.mapper(documento);
     }
+
+    @Override
+    public Documentos getDocumentoFolio(Long folio, Long IdEmpresa) {
+
+        DocumentosEntity documento = documentosRepository
+                .findByFolioAndIdEmpresaAndIdOperacionAndTipo(folio.toString(), IdEmpresa, "1", "3");
+
+        //System.out.println("DOCUMENTO FOLIO");
+        //System.out.println(documento + "\n");
+
+        return documentosMapper.mapper(documento);
+    }
+
+
 }

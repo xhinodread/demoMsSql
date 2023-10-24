@@ -141,6 +141,8 @@ const limpiarPantalla =()=>{
     $( "#id_contribuyente" ).val("");
     $( "#rut_funcionario" ).val("");
     $( "#id_contrato" ).val("");
+    $( "#dias_vacaciones_funcionario" ).val("");
+    evaluaId_contrato();
 }
 
 const autoCompleteNombreFunc=()=>{
@@ -156,8 +158,9 @@ const autoCompleteNombreFunc=()=>{
         $( "#id_contribuyente" ).val( ui.item.value );
         $( "#rut_funcionario" ).val( ui.item.rut );
         $( "#id_contrato" ).val( ui.item.idContratoPersonal );
-        $( "#dias_vacaciones_funcionario" ).val( ui.item.diasVacaciones );
+        $( "#dias_vacaciones_funcionario" ).val( ui.item.dias );
         tabla();
+        evaluaId_contrato();
         return false;
       }
     })
@@ -216,7 +219,15 @@ const popAddVacacion=()=>{
     alert("popAddVacacion");
 }
 
-const datePicker = ()=>{
+const evaluaId_contrato=()=>{
+    if( $('#id_contrato').val().length <=0 ){
+        $('#btnAddVacacion').prop("disabled", true);
+        return;
+    }
+    $('#btnAddVacacion').prop("disabled", false);
+}
+
+const datePickerAddVacacion = ()=>{
     $('#datepickerDesde').val("");
     $('#datepickerDesde').datepicker();
 
@@ -229,9 +240,27 @@ const reordenarFecha=(string_fecha)=>{
     return array_string[1]+"/"+array_string[0]+"/"+array_string["2"];
 }
 
+const calcularDias =()=>{
+    var desde = $('#datepickerDesde').val().replaceAll("/","-");
+    var hasta = $('#datepickerHasta').val().replaceAll("/","-");
+    console.log(desde+" "+hasta);
+
+    $.ajax({
+      type: "GET",
+      url: "/calcularDias/"+desde+"/"+hasta,
+      async: true,
+      data: {},
+      success: function (data) {
+        console.log(data);
+      }
+    });
+
+}
+
 $( function() {
     changeEmpresas();
     autoCompleteNombreFunc();
+    evaluaId_contrato();
 
     $('#datepickerDesde').on( "change", function() {
         $(this).val( reordenarFecha($(this).val()) );

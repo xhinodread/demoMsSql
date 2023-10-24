@@ -43,6 +43,9 @@ public class IndexController {
     private ContratoVacacionesService contratoVacacionesService;
     @Autowired
     private ContratoPersonalService contratoPersonalService;
+
+    @Autowired
+    private FeriadosService feriadosService;
     @Autowired
     @Lazy
     private ValidaRutUtil validaRutUtil;
@@ -133,6 +136,27 @@ public class IndexController {
         }
     }
 
+    @GetMapping("/documentos_folio/{folio}/{id_empresa}")
+    public ResponseEntity<?> getDocumentoFolio(
+            @PathVariable("folio") Long folio,
+            @PathVariable("id_empresa") Long id_empresa
+    ){
+        if(id_empresa == null)id_empresa=1L;
+
+        if( folio!=null ){
+            Documentos elDoc = documentosService.getDocumentoFolio(folio, id_empresa);
+            return ResponseEntity.ok(elDoc);
+        }else{
+            System.out.println("ERRRO ");
+
+            // return (ResponseEntity<Documentos>) ResponseEntity.noContent();
+            // return ResponseEntity.ok(null);
+            // return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
     @GetMapping("/referencias")
     public ResponseEntity<?> setReferencias(){
         DocumentoReferencias laReferencia = new DocumentoReferencias(
@@ -174,7 +198,7 @@ public class IndexController {
     public ResponseEntity<?> agregarVacaciones(){
         ContratoVacaciones unaVacacion = new ContratoVacaciones(
                 null,
-                7L,
+                488L,
                 "2023",
                 "2023-01-02",
                 "2023-01-20",
@@ -182,6 +206,25 @@ public class IndexController {
         );
         if(!true)contratoVacacionesService.setContratoVacaciones(unaVacacion);
         return ResponseEntity.ok(unaVacacion);
+    }
+
+    @GetMapping("/calcularDias/{desde}/{hasta}")
+    public ResponseEntity<?> calcularDias(
+            @PathVariable(name="desde", required = false) String desde,
+            @PathVariable(name="hasta", required = false) String hasta
+    ){
+
+        Integer respDias = generar.calcularDias(desde, hasta);
+        String[] fechas = new String[]{desde, hasta, String.valueOf(respDias)};
+
+        return ResponseEntity.ok(fechas);
+    }
+
+    @GetMapping("/feriados")
+    public ResponseEntity<?> feriados(){
+        List<Feriados> feriados = feriadosService.getFeriados("09-10-2023", "16-10-2023");
+        //System.out.println(feriados);
+        return ResponseEntity.ok(feriados);
     }
 
     @GetMapping("/jsoup/{mes}")

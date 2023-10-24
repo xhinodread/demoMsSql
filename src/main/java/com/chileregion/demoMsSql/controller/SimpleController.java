@@ -62,6 +62,18 @@ public class SimpleController {
         return "jmapping";
     }
 
+    @GetMapping("/documentosDte")
+    public String documentosDte(Model model){
+        List<Empresa> empresas = empresaService.getEmpresas()
+                .stream()
+                .filter(EmpresaUtils::selectFiltroEmpresasDtes)
+                .sorted(Comparator.comparing(Empresa::getRazonSocial).thenComparing(Empresa::getRazonSocial))
+                .collect(Collectors.toList());
+
+        model.addAttribute("empresas", empresas);
+        return "documentos_dte";
+    }
+
 
     @GetMapping("/main")
     public String mainErp(){

@@ -64,13 +64,9 @@
             <div class="col-4" >
                 <!--  <button class="btn btn-primary" onclick="popAddVacacion()" >Agregar Vacación</button>
               Button trigger modal -->
-                <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="datePicker()" >
+                <button id="btnAddVacacion" type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="datePickerAddVacacion()" >
                     Agregar Vacación
                 </button>
-                <br>
-                <hr>
-                <input id="project">
-                <input type="hidden" id="project-id">
             </div>
         </div>
 
@@ -96,7 +92,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-4">
-                                <button class="btn btn-outline-dark btn-sm" >Calcular Días</button>
+                                <button id="calcularDias" class="btn btn-outline-dark btn-sm" onclick="calcularDias()" >Calcular Días</button>
                             </div>
                             <div class="col-md-4">
                                 dias vaca

@@ -11,7 +11,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Documentos {
-
     @JMap
     private Long IdDteCabecera;
     @JMap
@@ -33,6 +32,8 @@ public class Documentos {
     private Long monto_real;
     @JMap
     private String estado;
+    private String id_operacion;
+    private String montoIva;
 
     private Empresa empresa;
     private Contribuyente contribuyente;
