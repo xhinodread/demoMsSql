@@ -4,6 +4,7 @@ import com.chileregion.demoMsSql.domain.Documentos;
 import com.chileregion.demoMsSql.persistance.entities.DocumentosEntity;
 import com.chileregion.demoMsSql.persistance.repository.DocumentosRepository;
 import com.chileregion.demoMsSql.utils.DocumentosMapper;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +44,29 @@ public class DocumentosServiceImp implements DocumentosService {
         //System.out.println(documento + "\n");
 
         return documentosMapper.mapper(documento);
+    }
+
+    @Override
+    public Long getDocumentoFolioNuevo(Long folio, Long IdEmpresa) {
+        DocumentosEntity documento;
+
+        Long countadocFolio = documentosRepository
+                .countByFolioAndIdEmpresaAndIdOperacionAndTipo(folio.toString(), IdEmpresa, "1", "3");
+        //System.out.println("DOCUMENTO nuevo FOLIO");
+        //System.out.println(countadocFolio + "\n");
+        return countadocFolio;
+        //return documentosMapper.mapper(documento);
+    }
+
+    @Override
+    public String setNuevoFolio(Long nuevo_folio, Long id_dtecabecera) {
+        System.out.println("setNuevoFolio");
+        System.out.println(nuevo_folio + "\n" + id_dtecabecera);
+
+        int cambio = documentosRepository.cambiarFolio(nuevo_folio,id_dtecabecera);
+        System.out.println("setNuevoFolio out....");
+
+        return String.valueOf(cambio);
     }
 
 

@@ -9,5 +9,8 @@ public interface DocumentosService {
 
     Documentos getDocumentoFolio(Long folio, Long IdEmpresa);
 
+    Long getDocumentoFolioNuevo(Long folio, Long IdEmpresa);
+
+    String setNuevoFolio(Long nuevo_folio, Long id_dtecabecera);
 
 }

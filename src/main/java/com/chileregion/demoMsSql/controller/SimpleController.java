@@ -18,14 +18,12 @@ import java.util.stream.Collectors;
 
 @Controller
 public class SimpleController {
-
     @Autowired
     @Lazy
     private ContribuyenteService contribuyenteService;
     @Autowired
     @Lazy
     private Generar generar;
-
     @Autowired
     @Lazy
     private EmpresaService empresaService;
@@ -73,7 +71,6 @@ public class SimpleController {
         model.addAttribute("empresas", empresas);
         return "documentos_dte";
     }
-
 
     @GetMapping("/main")
     public String mainErp(){

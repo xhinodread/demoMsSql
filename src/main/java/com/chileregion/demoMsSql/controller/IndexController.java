@@ -4,6 +4,7 @@ import com.chileregion.demoMsSql.domain.*;
 import com.chileregion.demoMsSql.persistance.entities.ContribuyenteEntity;
 import com.chileregion.demoMsSql.services.*;
 import com.chileregion.demoMsSql.utils.Generar;
+import com.chileregion.demoMsSql.utils.HacerXmlUno;
 import com.chileregion.demoMsSql.utils.ProcesarImpUnico;
 import com.chileregion.demoMsSql.utils.ValidaRutUtil;
 import org.jsoup.Connection;
@@ -19,11 +20,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @RestController
 public class IndexController {
@@ -46,6 +51,9 @@ public class IndexController {
 
     @Autowired
     private FeriadosService feriadosService;
+    @Autowired
+    @Lazy
+    private DtePackSIIService dtePackSIIService;
     @Autowired
     @Lazy
     private ValidaRutUtil validaRutUtil;
@@ -144,6 +152,7 @@ public class IndexController {
         if(id_empresa == null)id_empresa=1L;
 
         if( folio!=null ){
+            //Documentos elDoc = documentosService.getDocumentoFolioNuevo(folio, id_empresa);
             Documentos elDoc = documentosService.getDocumentoFolio(folio, id_empresa);
             return ResponseEntity.ok(elDoc);
         }else{
@@ -156,6 +165,46 @@ public class IndexController {
         }
     }
 
+    @GetMapping("/documentos_folio_disp/{nuevo_folio}/{id_empresa}")
+    public ResponseEntity<?> getDocumentoFolioDisp(
+        @PathVariable("nuevo_folio") Long nuevo_folio,
+        @PathVariable("id_empresa") Long id_empresa
+    ){
+        if(id_empresa == null)id_empresa=1L;
+
+        if( nuevo_folio!=null ){
+            Long elDoc = documentosService.getDocumentoFolioNuevo(nuevo_folio, id_empresa);
+            System.out.println("respuesta documentos_folio_disp");
+            System.out.println(elDoc);
+            //return ResponseEntity.ok(elDoc);
+            return ResponseEntity.status(HttpStatus.OK).body(elDoc.toString());
+        }else{
+            System.out.println("ERROR ");
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/documentos_folio_nuevo/{nuevo_folio}/{id_dtecabecera}")
+    public ResponseEntity<?> setNuevoFolio(
+        @PathVariable("nuevo_folio") Long nuevo_folio,
+        @PathVariable("id_dtecabecera") Long id_dtecabecera
+    ){
+        System.out.println("in: "  + nuevo_folio + "\n" + id_dtecabecera);
+        String cambioFolio = documentosService.setNuevoFolio(nuevo_folio, id_dtecabecera);
+        System.out.println("out: " + nuevo_folio + "\n" + id_dtecabecera);
+
+        return ResponseEntity.ok(cambioFolio);
+    }
+
+    @GetMapping("/dtePack_limpiar/{id_dtecabecera}")
+    public ResponseEntity<?> limpiarDtePack(@PathVariable("id_dtecabecera") Long id_dtecabecera){
+        // DtePackSII elDtePackSii = dtePackSIIService.getDtePackSii(id_dtecabecera);
+        Long delDtePackSii = dtePackSIIService.delDtePackSii(id_dtecabecera);
+        System.out.println("limpiarDtePack: " + delDtePackSii + "\n" + id_dtecabecera);
+
+        // return ResponseEntity.ok(elDtePackSii);
+        return ResponseEntity.ok(delDtePackSii);
+    }
 
     @GetMapping("/referencias")
     public ResponseEntity<?> setReferencias(){
@@ -304,6 +353,27 @@ public class IndexController {
             System.out.println(e);
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/hacerxml")
+    public ResponseEntity<?> hacerxml(){
+
+        try {
+            HacerXmlUno creador = new HacerXmlUno();
+
+            creador.crearDocumento();
+            creador.escribirArchivo();
+            System.out.println( creador.convertirString() );
+
+        } catch (ParserConfigurationException ex) {
+            Logger.getLogger(HacerXmlUno.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (TransformerException ex) {
+            Logger.getLogger(HacerXmlUno.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+
+        return ResponseEntity.ok("hacerxml");
+
     }
 
 
