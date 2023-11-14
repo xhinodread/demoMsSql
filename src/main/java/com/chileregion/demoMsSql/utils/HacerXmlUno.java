@@ -78,7 +78,7 @@ public class HacerXmlUno {
         Transformer transformer = transformerFactory.newTransformer();
 
         // Archivo donde almacenaremos el XML
-        File archivo = new File("../xmls/dentrada.xml");
+        File archivo = new File("../xmls/documento.xml");
 
         // Fuente de datos, en este caso el documento XML
         DOMSource source = new DOMSource(documento);
@@ -91,14 +91,141 @@ public class HacerXmlUno {
     /**
      * Creamos un documento con un elemento principal y varios subElementos
      */
+
+    public void crearCaratula(Element element){
+        Element rutEmisor = documento.createElement("RutEmisor");
+        rutEmisor.setTextContent("99586050-3");
+
+        Element rutEnvia = documento.createElement("RutEnvia");
+        rutEnvia.setTextContent("16388980-3");
+
+        Element rutReceptor = documento.createElement("RutReceptor");
+        rutReceptor.setTextContent("60803000-K");
+
+        Element fchResol = documento.createElement("FchResol");
+        fchResol.setTextContent("2014-08-22");
+
+        Element nroResol = documento.createElement("NroResol");
+        nroResol.setTextContent("80");
+
+        Element tmstFirmaEnv = documento.createElement("TmstFirmaEnv");
+        tmstFirmaEnv.setTextContent("2023-05-22T16:15:33");
+
+        Element subTotDTE = documento.createElement("SubTotDTE");
+
+        Element tpoDTE = documento.createElement("TpoDTE");
+        tpoDTE.setTextContent("33");
+
+        Element nroDTE = documento.createElement("NroDTE");
+        nroDTE.setTextContent("1");
+
+        element.appendChild(rutEmisor);
+        element.appendChild(rutEnvia);
+        element.appendChild(rutReceptor);
+        element.appendChild(fchResol);
+        element.appendChild(nroResol);
+        element.appendChild(tmstFirmaEnv);
+        subTotDTE.appendChild(tpoDTE);
+        subTotDTE.appendChild(nroDTE);
+        element.appendChild(subTotDTE);
+    }
+
+    public void crearDte(Element element){
+        Element dte = documento.createElement("DTE");
+        dte.setAttribute("version", "1.0");
+        crearDocDte(dte);
+        element.appendChild(dte);
+    }
+
+    public void crearDocDte(Element element){
+        Element documentoDte = documento.createElement("Documento");
+        documentoDte.setAttribute("ID", "T33F202");
+        encabezadoDocDte(documentoDte);
+        element.appendChild(documentoDte);
+    }
+
+    public void encabezadoDocDte(Element element){
+        Element documentoDte = documento.createElement("Encabezado");
+
+        Element idDoc = documento.createElement("IdDoc");
+        String[] idDoscs = {"TipoDTE", "Folio", "FchEmis", "FchVenc"};
+        for (String item : idDoscs) {
+            Element item_ = documento.createElement(item);
+            idDoc.appendChild(item_);
+        }
+
+        Element emisor = documento.createElement("Emisor");
+        String[] emisors = {"RUTEmisor", "RznSoc", "GiroEmis", "Acteco", "DirOrigen", "CmnaOrigen"};
+        for (String item : emisors) {
+            Element item_ = documento.createElement(item);
+            emisor.appendChild(item_);
+        }
+
+        Element receptor = documento.createElement("Receptor");
+        String[] receptors = {"RUTRecep", "RznSocRecep", "GiroRecep", "DirRecep", "CmnaRecep"};
+        for (String item : receptors) {
+            Element item_ = documento.createElement(item);
+            receptor.appendChild(item_);
+        }
+
+        Element totales = documento.createElement("Totales");
+        String[] totaless = {"MntNeto", "MntExe", "TasaIVA", "IVA", "MntTotal"};
+        for (String item : totaless) {
+            Element item_ = documento.createElement(item);
+            totales.appendChild(item_);
+        }
+
+
+        documentoDte.appendChild(idDoc);
+        documentoDte.appendChild(emisor);
+        documentoDte.appendChild(receptor);
+        documentoDte.appendChild(totales);
+
+        element.appendChild(documentoDte);
+    }
+    public void crearDocumentoXml() {
+        // Creamos el elemento principal
+        Element entrada = documento.createElement("EnvioDTE");
+        // Hacemos el elemento entrada descender directo del nodo XML principal
+        entrada.setAttribute("xmlns", "http://www.sii.cl/SiiDte");
+        entrada.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+        entrada.setAttribute("xsi:schemaLocation", "http://www.sii.cl/SiiDte EnvioDTE_v10.xsd");
+        entrada.setAttribute("version", "1.0");
+        documento.appendChild(entrada);
+
+        // Creamos el Elemento de SetDTE ****************************************************
+        Element setDTE = documento.createElement("SetDTE");
+        // Establecemos el contenido del titulo
+        setDTE.setAttribute("ID", "SetDoc");
+        entrada.appendChild(setDTE);
+
+        Element caratula = documento.createElement("Caratula");
+        caratula.setAttribute("version", "1.0");
+        crearCaratula(caratula);
+        setDTE.appendChild(caratula);
+
+        crearDte(setDTE);
+
+        //Creamos mas elemento Signature ****************************************************
+        Element signature = documento.createElement("Signature");
+        signature.setAttribute("xmlns", "http://www.w3.org/2000/09/xmldsig#");
+        signature.setTextContent("hashRaygoza");
+        entrada.appendChild(signature);
+
+     }
+
     public void crearDocumento() {
         // Creamos el elemento principal
-        Element entrada = documento.createElement("ENTRADA");
+        Element entrada = documento.createElement("EnvioDTE");
         // Hacemos el elemento entrada descender directo del nodo XML principal
+        entrada.setAttribute("xmlns", "http://www.sii.cl/SiiDte");
+        entrada.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+        entrada.setAttribute("xsi:schemaLocation", "http://www.sii.cl/SiiDte EnvioDTE_v10.xsd");
+        entrada.setAttribute("version", "1.0");
         documento.appendChild(entrada);
 
         // Creamos el Elemento de titulo
-        Element titulo = documento.createElement("TITULO");
+        Element titulo = documento.createElement("SetDTE");
         // Establecemos el contenido del titulo
         titulo.setTextContent("Creacion de XML");
         // Indicamos que el elemento titulo desciende de entrada

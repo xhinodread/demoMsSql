@@ -361,9 +361,9 @@ public class IndexController {
         try {
             HacerXmlUno creador = new HacerXmlUno();
 
-            creador.crearDocumento();
+            creador.crearDocumentoXml();
             creador.escribirArchivo();
-            System.out.println( creador.convertirString() );
+            // System.out.println( creador.convertirString() );
 
         } catch (ParserConfigurationException ex) {
             Logger.getLogger(HacerXmlUno.class.getName()).log(Level.SEVERE, null, ex);
