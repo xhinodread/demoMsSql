@@ -23,6 +23,8 @@ public class EmpresaEntity {
     @Column(name="RazonSocial", nullable = false, unique = true)
     //@JMapAccessor(get="RazonSocial")
     private String RazonSocial;
+    @Column(name="Giro", nullable = false, unique = true)
+    private String Giro;
 
    // public EmpresaEntity(){ super(); }
 

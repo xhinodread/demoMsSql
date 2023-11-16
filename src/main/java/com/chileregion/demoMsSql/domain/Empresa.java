@@ -18,6 +18,8 @@ public class Empresa {
     private String RUT;
     @JMap
     private String RazonSocial;
+    private String Giro;
+
     //public Empresa(){ super(); }
 
 }

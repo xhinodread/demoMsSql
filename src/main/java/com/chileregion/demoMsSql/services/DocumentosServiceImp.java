@@ -17,8 +17,8 @@ public class DocumentosServiceImp implements DocumentosService {
     @Override
     public Documentos getDocumentoId(Long id) {
         DocumentosEntity documento = documentosRepository.findByIdDteCabecera(id); /// .findDocumento(id);
-        System.out.println("DOCUMENTO");
-        System.out.println(documento + "\n");
+        //System.out.println("DOCUMENTO");
+        //System.out.println(documento + "\n");
 
         /**** /
         EmpresaEntity empresa = documento.getEmpresaEntity();

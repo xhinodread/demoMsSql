@@ -37,7 +37,8 @@ public class EmpresaServiceDbImp implements EmpresaService {
                     Empresa empresa = new Empresa(
                             empresaEntity.getIdEmpresa(),
                             empresaEntity.getRUT(),
-                            empresaEntity.getRazonSocial()
+                            empresaEntity.getRazonSocial(),
+                            empresaEntity.getGiro()
                     );
 
                     return empresa;

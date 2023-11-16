@@ -1,12 +1,17 @@
 package com.chileregion.demoMsSql.controller;
 
 import com.chileregion.demoMsSql.domain.*;
+import com.chileregion.demoMsSql.domain.encabezadoXml.Emisor;
+import com.chileregion.demoMsSql.domain.encabezadoXml.IdDoc;
+import com.chileregion.demoMsSql.domain.encabezadoXml.Receptor;
+import com.chileregion.demoMsSql.domain.encabezadoXml.Totales;
 import com.chileregion.demoMsSql.persistance.entities.ContribuyenteEntity;
 import com.chileregion.demoMsSql.services.*;
 import com.chileregion.demoMsSql.utils.Generar;
 import com.chileregion.demoMsSql.utils.HacerXmlUno;
 import com.chileregion.demoMsSql.utils.ProcesarImpUnico;
 import com.chileregion.demoMsSql.utils.ValidaRutUtil;
+import com.chileregion.demoMsSql.utils.xml.PrepararDte;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -23,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.lang.reflect.Type;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -63,6 +69,9 @@ public class IndexController {
     @Autowired
     @Lazy
     private Generar generar;
+    @Autowired
+    @Lazy
+    private PrepararDte prepararDte;
 
     @GetMapping("/")
     public String index(){
@@ -355,13 +364,72 @@ public class IndexController {
         }
     }
 
-    @GetMapping("/hacerxml")
-    public ResponseEntity<?> hacerxml(){
+    @GetMapping("/hacerxml/{idDteCabecera}")
+    public ResponseEntity<?> hacerxml(@PathVariable("idDteCabecera") Long idDteCabecera){
 
         try {
-            HacerXmlUno creador = new HacerXmlUno();
 
-            creador.crearDocumentoXml();
+            if(idDteCabecera == null){
+                return ResponseEntity.ok("Error...." );
+            }
+
+            Documentos elDoc = documentosService.getDocumentoId(idDteCabecera);
+            //System.out.println( elDoc );
+            //System.out.println( elDoc.getDocumentoDetalles());
+
+            Empresa emisor = elDoc.getEmpresa();
+            Contribuyente receptor = elDoc.getContribuyente();
+
+            prepararDte = new PrepararDte(elDoc);
+            CaratulaXml caratulaXml1 = prepararDte.caratulaXml();
+
+            CaratulaXml caratulaXml2 =  new CaratulaXml(
+                    emisor.getRUT(),
+                    "16388980-3",
+                    receptor.getRUT(),
+                    "2014-08-22",
+                    "80",
+                    "2023-05-22T12:47:05",
+                    "33" ,
+                    "1"
+            );
+
+            ///System.out.println( caratulaXml1 );
+            System.out.println( caratulaXml1 );
+
+
+            IdDoc idDoc1 = new IdDoc(
+                    "33",
+                    elDoc.getFolio(),
+                    elDoc.getFecha_emision(),
+                    elDoc.getFecha_emision()
+            );
+            Emisor emisor1 = new Emisor(
+                    emisor.getRUT(),
+                    emisor.getRazonSocial(),
+                    emisor.getGiro(),
+                    "acteco", "Direccion", "comuna"
+            );
+            Receptor receptor1 = new Receptor(
+                    receptor.getRUT(),
+                    receptor.getRazonSocial(),
+                    receptor.getGiro(),
+                    "direccion", "communa"
+            );
+
+            String montoIva = elDoc.getMontoIva();
+            Integer montoNeto = elDoc.getMonto_total().intValue() - Math.round(Float.parseFloat(montoIva));
+            Totales totales1 = new Totales(
+                    montoNeto.toString(),
+                    "0", "19",
+                    elDoc.getMontoIva(),
+                    elDoc.getMonto_total().toString()
+            );
+
+            EncabezadoXml encabezadoXml1 = new EncabezadoXml(idDoc1, emisor1, receptor1, totales1);
+
+            HacerXmlUno creador = new HacerXmlUno();
+            creador.crearDocumentoXml(caratulaXml1, encabezadoXml1);
             creador.escribirArchivo();
             // System.out.println( creador.convertirString() );
 
@@ -371,8 +439,9 @@ public class IndexController {
             Logger.getLogger(HacerXmlUno.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-
-        return ResponseEntity.ok("hacerxml");
+        LocalDate localDate1 = LocalDate.now();
+        LocalTime localTime1 = LocalTime.now();
+        return ResponseEntity.ok("hacerxml: " +localDate1+" " + localTime1 );
 
     }
 

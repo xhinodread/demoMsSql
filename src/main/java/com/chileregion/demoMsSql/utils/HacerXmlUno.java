@@ -3,6 +3,8 @@ package com.chileregion.demoMsSql.utils;
 import java.io.File;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.logging.Level;
@@ -18,6 +20,12 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import com.chileregion.demoMsSql.domain.CaratulaXml;
+import com.chileregion.demoMsSql.domain.EncabezadoXml;
+import com.chileregion.demoMsSql.domain.encabezadoXml.Emisor;
+import com.chileregion.demoMsSql.domain.encabezadoXml.IdDoc;
+import com.chileregion.demoMsSql.domain.encabezadoXml.Receptor;
+import com.chileregion.demoMsSql.domain.encabezadoXml.Totales;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -92,98 +100,161 @@ public class HacerXmlUno {
      * Creamos un documento con un elemento principal y varios subElementos
      */
 
-    public void crearCaratula(Element element){
-        Element rutEmisor = documento.createElement("RutEmisor");
-        rutEmisor.setTextContent("99586050-3");
+    public void crearCaratula(Element element, CaratulaXml caratulaXml){
+        Element caratula = documento.createElement("Caratula");
+        caratula.setAttribute("version", "1.0");
 
-        Element rutEnvia = documento.createElement("RutEnvia");
-        rutEnvia.setTextContent("16388980-3");
+        Element rutEmisor = documento.createElement("RutEmisor"); rutEmisor.setTextContent(caratulaXml.getRutEmisor());
+        Element rutEnvia = documento.createElement("RutEnvia"); rutEnvia.setTextContent(caratulaXml.getRutEnvia());
+        Element rutReceptor = documento.createElement("RutReceptor"); rutReceptor.setTextContent("60803000-K");
+        Element fchResol = documento.createElement("FchResol"); fchResol.setTextContent("2014-08-22");
+        Element nroResol = documento.createElement("NroResol"); nroResol.setTextContent("80");
 
-        Element rutReceptor = documento.createElement("RutReceptor");
-        rutReceptor.setTextContent("60803000-K");
-
-        Element fchResol = documento.createElement("FchResol");
-        fchResol.setTextContent("2014-08-22");
-
-        Element nroResol = documento.createElement("NroResol");
-        nroResol.setTextContent("80");
-
-        Element tmstFirmaEnv = documento.createElement("TmstFirmaEnv");
-        tmstFirmaEnv.setTextContent("2023-05-22T16:15:33");
-
+        LocalTime localTime1 = LocalTime.now();
+        //Element tmstFirmaEnv = documento.createElement("TmstFirmaEnv"); tmstFirmaEnv.setTextContent("2023-05-22T16:15:33");
+        Element tmstFirmaEnv = documento.createElement("TmstFirmaEnv"); tmstFirmaEnv.setTextContent("2023-05-22T"+localTime1.format(DateTimeFormatter.ofPattern("HH:mm:ss")));
         Element subTotDTE = documento.createElement("SubTotDTE");
+        Element tpoDTE = documento.createElement("TpoDTE"); tpoDTE.setTextContent("33");
+        Element nroDTE = documento.createElement("NroDTE"); nroDTE.setTextContent("1");
 
-        Element tpoDTE = documento.createElement("TpoDTE");
-        tpoDTE.setTextContent("33");
-
-        Element nroDTE = documento.createElement("NroDTE");
-        nroDTE.setTextContent("1");
-
-        element.appendChild(rutEmisor);
-        element.appendChild(rutEnvia);
-        element.appendChild(rutReceptor);
-        element.appendChild(fchResol);
-        element.appendChild(nroResol);
-        element.appendChild(tmstFirmaEnv);
+        caratula.appendChild(rutEmisor);
+        caratula.appendChild(rutEnvia);
+        caratula.appendChild(rutReceptor);
+        caratula.appendChild(fchResol);
+        caratula.appendChild(nroResol);
+        caratula.appendChild(tmstFirmaEnv);
         subTotDTE.appendChild(tpoDTE);
         subTotDTE.appendChild(nroDTE);
-        element.appendChild(subTotDTE);
+        caratula.appendChild(subTotDTE);
+        element.appendChild(caratula);
     }
-
-    public void crearDte(Element element){
+    public void crearDte(Element element, EncabezadoXml encabezadoXml){
         Element dte = documento.createElement("DTE");
         dte.setAttribute("version", "1.0");
-        crearDocDte(dte);
+        crearDocDte(dte, encabezadoXml);
+        signatureDocDte(dte);
         element.appendChild(dte);
     }
-
-    public void crearDocDte(Element element){
+    public void crearDocDte(Element element, EncabezadoXml encabezadoXml){
         Element documentoDte = documento.createElement("Documento");
-        documentoDte.setAttribute("ID", "T33F202");
-        encabezadoDocDte(documentoDte);
+        String IdCodDte = "T33F"+encabezadoXml.getIdDoc().getFolio();
+        documentoDte.setAttribute("ID", IdCodDte);
+        encabezadoDocDte(documentoDte, encabezadoXml);
+        detalleDocDte(documentoDte);
+        referenciasDocDte(documentoDte);
+        referenciasDocDte(documentoDte);
+        tedDocDte(documentoDte);
+        tmstFirmaDocDte(documentoDte);
         element.appendChild(documentoDte);
     }
-
-    public void encabezadoDocDte(Element element){
+    public void encabezadoDocDte(Element element, EncabezadoXml encabezadoXml){
         Element documentoDte = documento.createElement("Encabezado");
 
         Element idDoc = documento.createElement("IdDoc");
+        IdDoc idDoc1 = encabezadoXml.getIdDoc();
+
         String[] idDoscs = {"TipoDTE", "Folio", "FchEmis", "FchVenc"};
+        String[] datosIdDoscs = {idDoc1.getTipoDTE(), idDoc1.getFolio(), idDoc1.getFchEmis(), idDoc1.getFchVenc()};
+        int cnt=0;
         for (String item : idDoscs) {
             Element item_ = documento.createElement(item);
+            item_.setTextContent(datosIdDoscs[cnt]);
             idDoc.appendChild(item_);
+            cnt++;
         }
 
+        cnt=0;
         Element emisor = documento.createElement("Emisor");
+        Emisor emisor1 = encabezadoXml.getEmisor();
         String[] emisors = {"RUTEmisor", "RznSoc", "GiroEmis", "Acteco", "DirOrigen", "CmnaOrigen"};
+        String[] datosEmisors = {emisor1.getRUTEmisor(), emisor1.getRznSoc(), emisor1.getGiroEmis(), emisor1.getActeco(), emisor1.getDirOrigen(), emisor1.getCmnaOrigen()};
+        //System.out.println(datosEmisors);
         for (String item : emisors) {
             Element item_ = documento.createElement(item);
+            //System.out.println(datosEmisors[cnt]);
+            item_.setTextContent(datosEmisors[cnt]);
             emisor.appendChild(item_);
+            cnt++;
         }
 
+        cnt=0;
         Element receptor = documento.createElement("Receptor");
+        Receptor receptor1 = encabezadoXml.getReceptor();
         String[] receptors = {"RUTRecep", "RznSocRecep", "GiroRecep", "DirRecep", "CmnaRecep"};
+        String[] datosReceptors = {receptor1.getRUTRecep(), receptor1.getRznSocRecep() ,receptor1.getGiroRecep(), receptor1.getDirRecep(), receptor1.getCmnaRecep()};
         for (String item : receptors) {
             Element item_ = documento.createElement(item);
+            item_.setTextContent(datosReceptors[cnt]);
             receptor.appendChild(item_);
+            cnt++;
         }
 
+        cnt=0;
         Element totales = documento.createElement("Totales");
+        Totales totales1 = encabezadoXml.getTotales();
         String[] totaless = {"MntNeto", "MntExe", "TasaIVA", "IVA", "MntTotal"};
+        String[] datosTotaless ={totales1.getMntNeto(), totales1.getMntExe(), totales1.getTasaIVA(), totales1.getIVA(), totales1.getMntTotal()};
         for (String item : totaless) {
             Element item_ = documento.createElement(item);
+            item_.setTextContent(datosTotaless[cnt]);
             totales.appendChild(item_);
+            cnt++;
         }
-
-
         documentoDte.appendChild(idDoc);
         documentoDte.appendChild(emisor);
         documentoDte.appendChild(receptor);
         documentoDte.appendChild(totales);
-
         element.appendChild(documentoDte);
     }
-    public void crearDocumentoXml() {
+
+    public void detalleDocDte(Element element){
+        Element detalleDocDte = documento.createElement("Detalle");
+        String[] itemDetalle = {"NroLinDet", "NmbItem", "QtyItem", "UnmdItem", "PrcItem", "MontoItem"};
+        for (String item : itemDetalle) {
+            Element item_ = documento.createElement(item);
+            detalleDocDte.appendChild(item_);
+        }
+        element.appendChild(detalleDocDte);
+    }
+
+    public void referenciasDocDte(Element element){
+        Element referenciasDocDte = documento.createElement("Referencia");
+        String[] itemDetalle = {"NroLinRef", "TpoDocRef", "FolioRef", "FchRef", "RazonRef"};
+        for (String item : itemDetalle) {
+            Element item_ = documento.createElement(item);
+            referenciasDocDte.appendChild(item_);
+        }
+        element.appendChild(referenciasDocDte);
+    }
+
+    public void tedDocDte(Element element){
+        Element tedDocDte = documento.createElement("TED");
+        tedDocDte.setAttribute("version", "1.0");
+
+        String[] itemDetalle = {"DD", "FRMT"};
+        for (String item : itemDetalle) {
+            Element item_ = documento.createElement(item);
+            tedDocDte.appendChild(item_);
+        }
+        element.appendChild(tedDocDte);
+    }
+
+    public void tmstFirmaDocDte(Element element){
+        Element tmstFirmaDocDte = documento.createElement("TmstFirma");
+        element.appendChild(tmstFirmaDocDte);
+    }
+
+    public void signatureDocDte(Element element){
+        Element signatureDocDte = documento.createElement("Signature");
+        signatureDocDte.setAttribute("xmlns", "http://www.w3.org/2000/09/xmldsig#");
+
+        element.appendChild(signatureDocDte);
+    }
+    public void crearDocumentoXml(CaratulaXml caratulaXml, EncabezadoXml encabezadoXml) {
+
+        //System.out.println(caratulaXml);
+        //System.out.println(encabezadoXml.getIdDoc().getTipoDTE());
+
         // Creamos el elemento principal
         Element entrada = documento.createElement("EnvioDTE");
         // Hacemos el elemento entrada descender directo del nodo XML principal
@@ -195,16 +266,14 @@ public class HacerXmlUno {
 
         // Creamos el Elemento de SetDTE ****************************************************
         Element setDTE = documento.createElement("SetDTE");
-        // Establecemos el contenido del titulo
         setDTE.setAttribute("ID", "SetDoc");
         entrada.appendChild(setDTE);
 
-        Element caratula = documento.createElement("Caratula");
-        caratula.setAttribute("version", "1.0");
-        crearCaratula(caratula);
-        setDTE.appendChild(caratula);
+        // Caratula
+        crearCaratula(setDTE, caratulaXml);
 
-        crearDte(setDTE);
+        // DTE
+        crearDte(setDTE, encabezadoXml);
 
         //Creamos mas elemento Signature ****************************************************
         Element signature = documento.createElement("Signature");

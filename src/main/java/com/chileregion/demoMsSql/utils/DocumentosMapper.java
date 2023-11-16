@@ -35,7 +35,8 @@ public class DocumentosMapper {
         return new Empresa(
             empresaEntity.getIdEmpresa(),
             empresaEntity.getRUT(),
-            empresaEntity.getRazonSocial()
+            empresaEntity.getRazonSocial(),
+                empresaEntity.getGiro()
         );
     }
 
