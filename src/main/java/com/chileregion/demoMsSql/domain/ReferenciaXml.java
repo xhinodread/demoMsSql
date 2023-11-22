@@ -7,11 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DetalleXml {
-    String nroLinDet;
-    String nmbItem;
-    String qtyItem;
-    String unmdItem;
-    String prcItem;
-    String montoItem;
+public class ReferenciaXml {
+    String nroLinRef;
+    String tpoDocRef;
+    String folioRef;
+    String fchRef;
+    String razonRef;
 }

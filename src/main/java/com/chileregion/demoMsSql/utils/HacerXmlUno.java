@@ -7,6 +7,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 // Clases para la creacion y manejo de XML
@@ -21,6 +22,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import com.chileregion.demoMsSql.domain.CaratulaXml;
+import com.chileregion.demoMsSql.domain.DetalleXml;
 import com.chileregion.demoMsSql.domain.EncabezadoXml;
 import com.chileregion.demoMsSql.domain.encabezadoXml.Emisor;
 import com.chileregion.demoMsSql.domain.encabezadoXml.IdDoc;
@@ -35,6 +37,8 @@ public class HacerXmlUno {
 
     // Objecto que representa al documento XML
     Document documento;
+
+    private int cnt =0;
 
     /**
      * Creamos el documento XML
@@ -100,7 +104,7 @@ public class HacerXmlUno {
      * Creamos un documento con un elemento principal y varios subElementos
      */
 
-    public void crearCaratula(Element element, CaratulaXml caratulaXml){
+    private void crearCaratula(Element element, CaratulaXml caratulaXml){
         Element caratula = documento.createElement("Caratula");
         caratula.setAttribute("version", "1.0");
 
@@ -128,26 +132,25 @@ public class HacerXmlUno {
         caratula.appendChild(subTotDTE);
         element.appendChild(caratula);
     }
-    public void crearDte(Element element, EncabezadoXml encabezadoXml){
+    private void crearDte(Element element, EncabezadoXml encabezadoXml, List<DetalleXml> detalleXml){
         Element dte = documento.createElement("DTE");
         dte.setAttribute("version", "1.0");
-        crearDocDte(dte, encabezadoXml);
+        crearDocDte(dte, encabezadoXml, detalleXml);
         signatureDocDte(dte);
         element.appendChild(dte);
     }
-    public void crearDocDte(Element element, EncabezadoXml encabezadoXml){
+    private void crearDocDte(Element element, EncabezadoXml encabezadoXml, List<DetalleXml> detalleXml){
         Element documentoDte = documento.createElement("Documento");
         String IdCodDte = "T33F"+encabezadoXml.getIdDoc().getFolio();
         documentoDte.setAttribute("ID", IdCodDte);
         encabezadoDocDte(documentoDte, encabezadoXml);
-        detalleDocDte(documentoDte);
-        referenciasDocDte(documentoDte);
+        detalleDocDte(documentoDte, detalleXml);
         referenciasDocDte(documentoDte);
         tedDocDte(documentoDte);
         tmstFirmaDocDte(documentoDte);
         element.appendChild(documentoDte);
     }
-    public void encabezadoDocDte(Element element, EncabezadoXml encabezadoXml){
+    private void encabezadoDocDte(Element element, EncabezadoXml encabezadoXml){
         Element documentoDte = documento.createElement("Encabezado");
 
         Element idDoc = documento.createElement("IdDoc");
@@ -206,18 +209,24 @@ public class HacerXmlUno {
         documentoDte.appendChild(totales);
         element.appendChild(documentoDte);
     }
-
-    public void detalleDocDte(Element element){
-        Element detalleDocDte = documento.createElement("Detalle");
-        String[] itemDetalle = {"NroLinDet", "NmbItem", "QtyItem", "UnmdItem", "PrcItem", "MontoItem"};
-        for (String item : itemDetalle) {
-            Element item_ = documento.createElement(item);
-            detalleDocDte.appendChild(item_);
-        }
-        element.appendChild(detalleDocDte);
+    private void detalleDocDte(Element element, List<DetalleXml> detalleXml){
+        this.cnt=1;
+        detalleXml.forEach(valor->{
+            Element detalleDocDte = documento.createElement("Detalle");
+            String[] itemDetalle = {"NroLinDet", "NmbItem", "QtyItem", "UnmdItem", "PrcItem", "MontoItem"};
+            String[] valores = {String.valueOf(this.cnt), valor.getNmbItem(), valor.getQtyItem(), valor.getUnmdItem(), valor.getPrcItem(), valor.getMontoItem() };
+            int contDet =0;
+            for (String item : itemDetalle) {
+                Element item_ = documento.createElement(item);
+                item_.setTextContent(valores[contDet]);
+                detalleDocDte.appendChild(item_);
+                contDet++;
+            }
+            element.appendChild(detalleDocDte);
+            this.cnt++;
+        });
     }
-
-    public void referenciasDocDte(Element element){
+    private void referenciasDocDte(Element element){
         Element referenciasDocDte = documento.createElement("Referencia");
         String[] itemDetalle = {"NroLinRef", "TpoDocRef", "FolioRef", "FchRef", "RazonRef"};
         for (String item : itemDetalle) {
@@ -226,8 +235,7 @@ public class HacerXmlUno {
         }
         element.appendChild(referenciasDocDte);
     }
-
-    public void tedDocDte(Element element){
+    private void tedDocDte(Element element){
         Element tedDocDte = documento.createElement("TED");
         tedDocDte.setAttribute("version", "1.0");
 
@@ -238,19 +246,17 @@ public class HacerXmlUno {
         }
         element.appendChild(tedDocDte);
     }
-
-    public void tmstFirmaDocDte(Element element){
+    private void tmstFirmaDocDte(Element element){
         Element tmstFirmaDocDte = documento.createElement("TmstFirma");
         element.appendChild(tmstFirmaDocDte);
     }
-
-    public void signatureDocDte(Element element){
+    private void signatureDocDte(Element element){
         Element signatureDocDte = documento.createElement("Signature");
         signatureDocDte.setAttribute("xmlns", "http://www.w3.org/2000/09/xmldsig#");
 
         element.appendChild(signatureDocDte);
     }
-    public void crearDocumentoXml(CaratulaXml caratulaXml, EncabezadoXml encabezadoXml) {
+    public void crearDocumentoXml(CaratulaXml caratulaXml, EncabezadoXml encabezadoXml, List<DetalleXml> detalleXml) {
 
         //System.out.println(caratulaXml);
         //System.out.println(encabezadoXml.getIdDoc().getTipoDTE());
@@ -273,7 +279,7 @@ public class HacerXmlUno {
         crearCaratula(setDTE, caratulaXml);
 
         // DTE
-        crearDte(setDTE, encabezadoXml);
+        crearDte(setDTE, encabezadoXml, detalleXml);
 
         //Creamos mas elemento Signature ****************************************************
         Element signature = documento.createElement("Signature");

@@ -16,9 +16,14 @@ public class DocumentosServiceImp implements DocumentosService {
     DocumentosMapper documentosMapper;
     @Override
     public Documentos getDocumentoId(Long id) {
+
         DocumentosEntity documento = documentosRepository.findByIdDteCabecera(id); /// .findDocumento(id);
         //System.out.println("DOCUMENTO");
         //System.out.println(documento + "\n");
+
+        if( documento == null ){
+            return null;
+        }
 
         /**** /
         EmpresaEntity empresa = documento.getEmpresaEntity();
