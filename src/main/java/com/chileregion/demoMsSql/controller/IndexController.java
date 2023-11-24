@@ -417,6 +417,7 @@ public class IndexController {
     @GetMapping(value="/firmarSemilla", produces= MediaType.APPLICATION_XML_VALUE)
     public ResponseEntity<?> hacerFirmarSemilla(){
         String xmlString= "";
+
         try{
             FirmarSemilla firmarSemilla = new FirmarSemilla();
             firmarSemilla.crearXml();
